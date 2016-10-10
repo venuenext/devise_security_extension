@@ -18,7 +18,10 @@ module Devise
       def password_archive_included?
         if deny_old_passwords > 0 and !password.nil?
           old_passwords_including_cur_change = old_passwords_to_be_denied.to_a
-          old_passwords_including_cur_change << OldPassword.new(old_password_params) # include most recent change in list, but don't save it yet!
+
+          # include most recent change in list, but don't save it yet!
+          old_passwords_including_cur_change << OldPassword.new(old_password_params)
+
           old_passwords_including_cur_change.each do |old_password|
             dummy                    = self.class.new
             dummy.encrypted_password = old_password.encrypted_password

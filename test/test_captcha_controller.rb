@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class TestWithCaptcha < ActionController::TestCase
-  include Devise::TestHelpers
+  include Devise::Test::ControllerHelpers
   tests Captcha::SessionsController
 
   setup do
@@ -9,9 +9,11 @@ class TestWithCaptcha < ActionController::TestCase
   end
 
   test 'When captcha is enabled, it is inserted correctly' do
-    post :create, captcha_user: {
-      email: "wrong@email.com",
-      password: "wrongpassword"
+    post :create, {
+      captcha_user: {
+        email: "wrong@email.com",
+        password: "wrongpassword"
+      }
     }
 
     assert_equal "The captcha input was invalid.", flash[:alert]
@@ -23,17 +25,20 @@ class TestWithCaptcha < ActionController::TestCase
       true
     end
 
-    post :create, captcha: "ABCDE", captcha_user: {
-      email: "wrong@email.com",
-      password: "wrongpassword"
+    post :create, { 
+      captcha: "ABCDE", 
+      captcha_user: {
+        email: "wrong@email.com",
+        password: "wrongpassword"
+      }
     }
 
-    assert_equal "Invalid email or password.", flash[:alert]
+    assert_equal "Invalid Email or password.", flash[:alert]
   end
 end
 
 class TestWithoutCaptcha < ActionController::TestCase
-  include Devise::TestHelpers
+  include Devise::Test::ControllerHelpers
   tests Devise::SessionsController
 
   setup do
@@ -41,12 +46,14 @@ class TestWithoutCaptcha < ActionController::TestCase
   end
 
   test 'When captcha is not enabled, it is not inserted' do
-    post :create, user: {
-      email: "wrong@email.com",
-      password: "wrongpassword"
+    post :create, { 
+      user: {
+        email: "wrong@email.com",
+        password: "wrongpassword"
+      }
     }
 
-    assert_equal "Invalid email or password.", flash[:alert]
+    assert_equal "Invalid Email or password.", flash[:alert]
   end
 end
 

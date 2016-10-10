@@ -1,6 +1,6 @@
 class Devise::ParanoidVerificationCodeController < DeviseController
-  skip_before_filter :handle_paranoid_verification
-  prepend_before_filter :authenticate_scope!, :only => [:show, :update]
+  skip_before_action :handle_paranoid_verification
+  prepend_before_action :authenticate_scope!, :only => [:show, :update]
 
   def show
     if !resource.nil? && resource.need_paranoid_verification?
@@ -14,7 +14,7 @@ class Devise::ParanoidVerificationCodeController < DeviseController
     if resource.verify_code(resource_params[:paranoid_verification_code])
       warden.session(scope)['paranoid_verify'] = false
       set_flash_message :notice, :updated
-      sign_in scope, resource, :bypass => true
+      bypass_sign_in resource, scope: scope
       redirect_to stored_location_for(scope) || :root
     else
       respond_with(resource, action: :show)

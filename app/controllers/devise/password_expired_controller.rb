@@ -1,7 +1,7 @@
 class Devise::PasswordExpiredController < DeviseController
-  skip_before_filter :handle_password_change
-  before_filter :skip_password_change, only: [:show, :update]
-  prepend_before_filter :authenticate_scope!, :only => [:show, :update]
+  skip_before_action :handle_password_change
+  before_action :skip_password_change, only: [:show, :update]
+  prepend_before_action :authenticate_scope!, :only => [:show, :update]
 
   def show
     respond_with(resource)
@@ -12,7 +12,7 @@ class Devise::PasswordExpiredController < DeviseController
     if resource.update_with_password(resource_params)
       warden.session(scope)['password_expired'] = false
       set_flash_message :notice, :updated
-      sign_in scope, resource, :bypass => true
+      bypass_sign_in resource, scope: scope
       redirect_to stored_location_for(scope) || :root
     else
       clean_up_passwords(resource)

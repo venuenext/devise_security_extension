@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class TestWithSecurityQuestion < ActionController::TestCase
-  include Devise::TestHelpers
+  include Devise::Test::ControllerHelpers
   tests SecurityQuestion::UnlocksController
 
   setup do
@@ -13,18 +13,22 @@ class TestWithSecurityQuestion < ActionController::TestCase
   end
 
   test 'When security question is enabled, it is inserted correctly' do
-    post :create, security_question_user: {
-      email: @user.email
-    }, security_question_answer: "wrong answer"
+    post :create, {
+      security_question_user: {
+        email: @user.email
+      }, security_question_answer: "wrong answer"
+    }
 
     assert_equal "The security question answer was invalid.", flash[:alert]
     assert_redirected_to new_security_question_user_unlock_path
   end
 
   test 'When security_question is valid, it runs as normal' do
-    post :create, security_question_user: {
-      email: @user.email
-    }, security_question_answer: @user.security_question_answer
+    post :create, {
+      security_question_user: {
+        email: @user.email
+      }, security_question_answer: @user.security_question_answer
+    }
 
     assert_equal "You will receive an email with instructions for how to unlock your account in a few minutes.", flash[:notice]
     assert_redirected_to new_security_question_user_session_path
@@ -32,7 +36,7 @@ class TestWithSecurityQuestion < ActionController::TestCase
 end
 
 class TestWithoutSecurityQuestion < ActionController::TestCase
-  include Devise::TestHelpers
+  include Devise::Test::ControllerHelpers
   tests Devise::UnlocksController
 
   setup do
@@ -44,8 +48,10 @@ class TestWithoutSecurityQuestion < ActionController::TestCase
   end
 
   test 'When security question is not enabled it is not inserted' do
-    post :create, user: {
-      email: @user.email
+    post :create, {
+      user: {
+        email: @user.email
+      }
     }
 
     assert_equal "You will receive an email with instructions for how to unlock your account in a few minutes.", flash[:notice]
